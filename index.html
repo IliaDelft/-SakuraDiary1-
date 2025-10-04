@@ -277,25 +277,41 @@
       });
     })();
 
-    /***** Публикация по ссылке через Supabase *****/
+            /***** Публикация по ссылке через Supabase *****/
     const SUPA_URL = 'https://jefcwyyxvoihtykizqem.supabase.co';
     const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImplZmN3eXl4dm9paHR5a2l6cWVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1Mzg0MTksImV4cCI6MjA3NTExNDQxOX0.pw2F9cpmeYBrTdW67_Xcpg4AhVKX2b0osGdngzLBBGI';
-    const supabase = window._createSupabaseClient ? window._createSupabaseClient(SUPA_URL, SUPA_KEY) : null;
+    const supabase = window._createSupabaseClient
+      ? window._createSupabaseClient(SUPA_URL, SUPA_KEY)
+      : null;
 
-    $('#shareBtn').addEventListener('click', async ()=>{
-      if(!supabase){ alert('Supabase не инициализирован'); return; }
+    function makeSlug(len = 10) {
+      const chars = 'abcdefghjkmnpqrstuvwxyz23456789';
+      let s = '';
+      for (let i = 0; i < len; i++) s += chars[Math.floor(Math.random() * chars.length)];
+      return s;
+    }
+
+    $('#shareBtn').addEventListener('click', async () => {
+      if (!supabase) { alert('Supabase не инициализирован'); return; }
+
       const payload = getAll();
-      const { data, error } = await supabase
-        .from('diaries')
-        .insert([{ data: payload }])
-        .select('id')
-        .single();
-      if (error || !data) {
-        console.error(error); alert('Не удалось сохранить запись 😢'); return;
+      let slug = makeSlug();
+
+      let inserted = null, tries = 0;
+      while (!inserted && tries < 5) {
+        const { data, error } = await supabase
+          .from('sakura_shares')
+          .insert([{ slug, payload }])
+          .select('slug')
+          .single();
+        if (!error && data) { inserted = data; }
+        else if (error && String(error.message).includes('duplicate')) { slug = makeSlug(); tries++; }
+        else { console.error(error); alert('Не удалось сохранить запись 😢'); return; }
       }
-      const link = `${location.origin}/share.html?id=${data.id}`;
+
+      const link = `https://sakura-diary-f3y4-otlqy37da-iliadelfts-projects.vercel.app/share.html?slug=${slug}`;
       const out = $('#shareOut'); if (out) out.value = link;
-      try { await navigator.clipboard.writeText(link); } catch(e) {}
+      try { await navigator.clipboard.writeText(link); } catch {}
       alert('Ссылка скопирована 🌸');
     });
 
