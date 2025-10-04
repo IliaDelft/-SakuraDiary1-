@@ -1,49 +1,306 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="apple-touch-icon" href="favicon.svg">
+  <title>Сакура — дневник КПТ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#ffeef6">
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>🌸 Сакура — старт</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap&subset=cyrillic-ext" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap&subset=cyrillic-ext" rel="stylesheet">
   <style>
-    :root{--bg:#fff8fb;--panel:#ffeef6;--ink:#2b2b2b;--brand:#e9a4c4;--brand-2:#d883ab}
+    :root{--bg:#fff8fb;--panel:#ffeef6;--panel-2:#ffe4f0;--ink:#2b2b2b;--muted:#6c6c6c;--brand:#e9a4c4;--brand-2:#d883ab;--line:#f5cfe0;--focus:#c96ea1}
     *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 'Manrope', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;overflow:hidden}
-    .wrap{position:relative;min-height:100%;display:grid;place-items:center;padding:32px}
-    .card{background:var(--panel);border:1px solid #f5cfe0;border-radius:18px;padding:28px 32px;box-shadow:0 20px 60px rgba(201,110,161,.18);text-align:center}
-    h1{margin:0 0 14px;font-size:clamp(26px,4vw,42px);font-weight:800;letter-spacing:.2px}
-    p{margin:0 0 18px;color:#6c6c6c;max-width:640px}
-    .btn{appearance:none;border:0;background:linear-gradient(180deg,var(--brand),var(--brand-2));color:#fff;
-      padding:16px 28px;border-radius:16px;font-weight:800;letter-spacing:.3px;cursor:pointer;
-      box-shadow:0 14px 30px rgba(216,131,171,.35);font-size:clamp(16px,2.4vw,20px)}
-    .btn:active{transform:translateY(1px)}
-    .sakura{position:fixed;inset:0;pointer-events:none;overflow:hidden}
-    .petal{position:absolute;top:-10vh;font-size:clamp(28px,6vw,56px);animation:fall var(--dur) linear infinite;opacity:.9;filter:drop-shadow(0 6px 6px rgba(0,0,0,.08))}
-    @keyframes fall{0%{transform:translate3d(var(--x,0),-10vh,0) rotate(0deg)}100%{transform:translate3d(calc(var(--x,0) + var(--drift)),110vh,0) rotate(360deg)}}
+    body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 'Manrope',ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    .wrap{max-width:1180px;margin:22px auto;padding:0 14px;position:relative}
+    .title{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    h1{margin:0;font-weight:800;font-size:clamp(20px,3vw,30px)}
+    .muted{color:var(--muted)}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap}
+    .btn{appearance:none;border:1px solid var(--brand-2);background:linear-gradient(180deg,var(--brand),var(--brand-2));color:#fff;padding:9px 12px;border-radius:11px;font-weight:800;cursor:pointer}
+    .btn.ghost{background:#fff;color:var(--brand-2)}
+    input,select,textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:#fff;font-family:inherit}
+    input:focus,select:focus,textarea:focus{outline:2px solid var(--focus);outline-offset:1px}
+    .grid{display:grid;gap:12px}
+    .split{display:grid;gap:14px;grid-template-columns:1.5fr .5fr}
+    @media(max-width:980px){.split{grid-template-columns:1fr}}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:0 8px 24px rgba(201,110,161,.08)}
+    .table-wrap{overflow:auto}
+    table{width:100%;border-collapse:collapse}
+    th,td{border:1px solid var(--line);padding:6px;vertical-align:top}
+    th{background:var(--panel-2);font-weight:700}
+    .center{text-align:center}
+    .rte{background:#fff;border:1px solid var(--line);border-radius:14px;min-height:200px;padding:12px}
+    .sakura-lite{position:fixed;inset:0;pointer-events:none;z-index:-1}
+    .lite{position:absolute;opacity:.35;font-size:18px;animation:fall linear infinite}
+    @keyframes fall{0%{transform:translateY(-10vh) rotate(0)}100%{transform:translateY(110vh) rotate(360deg);opacity:0}}
+    @media(print){.sakura-lite{display:none}}
+    .note{font-size:12px;color:var(--muted)}
   </style>
 </head>
 <body>
+  <div class="sakura-lite" id="sak"></div>
+
   <div class="wrap">
-    <main class="card">
-      <h1>🌸 Сакура — твои дневники</h1>
-      <p>Нажми «Начать» и сразу переходи к заполнению. Данные сохраняются локально. Для друзей — публикация по ссылке.</p>
-      <button class="btn" onclick="location.href='/app.html'">Начать</button>
-    </main>
-    <div class="sakura" id="sakura"></div>
+    <div class="title">
+      <h1>🌸 Сакура — дневник КПТ</h1>
+      <div class="toolbar">
+        <button class="btn" id="saveBtn">Сохранить черновик</button>
+        <button class="btn ghost" id="saveWeekBtn">Сохранить неделю</button>
+        <button class="btn ghost" id="weeksBtn">Недели ⤵</button>
+        <button class="btn ghost" onclick="window.print()">Печать</button>
+        <button class="btn ghost" id="shareBtn">Поделиться ссылкой</button>
+      </div>
+    </div>
+
+    <p class="muted">Локальное сохранение + публикация по ссылке. Шрифт — Manrope (кириллица).</p>
+
+    <div class="card grid">
+      <div class="grid" style="grid-template-columns:1fr 1fr 1fr">
+        <label>Имя: <input name="name" placeholder="Имя 👑"></label>
+        <label>Дата заполнения: <input type="date" name="date"></label>
+        <label>Неделя начата: <input type="date" name="week_start"></label>
+      </div>
+
+      <div class="split">
+        <div class="grid">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th rowspan="3" class="center">День</th>
+                  <th colspan="4" class="center">Сильное побуждение 🙏</th>
+                  <th colspan="3" class="center">Высший рейтинг 🏆</th>
+                  <th rowspan="3" class="center">Навыки 0–7</th>
+                </tr>
+                <tr>
+                  <th class="center">к суициду</th>
+                  <th class="center">к самоповреждению</th>
+                  <th class="center">к приёму веществ</th>
+                  <th class="center">к агрессии</th>
+                  <th class="center">опустошённость</th>
+                  <th class="center">физ. усталость</th>
+                  <th class="center">радость</th>
+                </tr>
+                <tr>
+                  <th class="center note">0–5</th>
+                  <th class="center note">0–5</th>
+                  <th class="center note">0–5</th>
+                  <th class="center note">0–5</th>
+                  <th class="center note">0–5</th>
+                  <th class="center note">0–5</th>
+                  <th class="center note">0–5</th>
+                </tr>
+              </thead>
+              <tbody id="rows-week"></tbody>
+            </table>
+          </div>
+
+          <div class="grid" style="grid-template-columns:1fr 1fr">
+            <label>Изменение в приёме медикаментов <textarea name="med_changes" placeholder="Например: …"></textarea></label>
+            <label>ДЗ и результаты <textarea name="hw_results" placeholder="Что пробовал / что получилось"></textarea></label>
+          </div>
+        </div>
+
+        <aside class="grid">
+          <div class="card" style="background:#fff">
+            <h3>⭐ Легенда навыков</h3>
+            <div class="note">0 — не думал; 1 — думал; 2 — хотел; 3 — пытался; 4 — применил, не помогло; 5 — применил, помогло; 6 — автоматически, не помогло; 7 — автоматически, помогло.</div>
+          </div>
+          <div class="card" style="background:#fff">
+            <h3>🌸 Побуждения (0–5)</h3>
+            <div class="grid">
+              <label>Бросить терапию <input type="number" min="0" max="5" name="urge_quit"></label>
+              <label>Принять вещества <input type="number" min="0" max="5" name="urge_substance"></label>
+              <label>Убить себя <input type="number" min="0" max="5" name="urge_suicide"></label>
+            </div>
+          </div>
+          <div class="card" style="background:#fff">
+            <h3>Комментарий к прошедшей сессии</h3>
+            <textarea name="session_comment" placeholder="Заметки и планы"></textarea>
+          </div>
+        </aside>
+      </div>
+
+      <div class="grid">
+        <h3 style="margin:10px 0 0">📝 Домашнее задание ДБТ</h3>
+        <div id="dbtEditor" class="rte" contenteditable="true" placeholder="Пиши сюда…"></div>
+      </div>
+
+      <div class="grid" style="grid-template-columns:1fr 1fr;align-items:center">
+        <input id="shareOut" readonly placeholder="ссылка появится тут" style="border:1px dashed var(--line);padding:8px;border-radius:10px;background:#fff">
+        <button id="resetBtn" class="btn ghost" title="Очистить всё">Очистить</button>
+      </div>
+    </div>
+
+    <p class="muted" style="margin-top:12px">Сделано с заботой 🌸 Можно работать локально или делиться безопасной ссылкой.</p>
   </div>
+
+  <!-- Supabase как ES-модуль, чтобы создать клиент -->
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+    window._createSupabaseClient = createClient;
+  </script>
+
   <script>
-    const root = document.getElementById('sakura'); const N = 30;
-    function spawn(){ const el=document.createElement('div'); el.className='petal'; el.textContent='🌸';
-      const x=Math.random()*100; const drift=(Math.random()*40-20)+'vw'; const dur=(8+Math.random()*8)+'s';
-      el.style.left=x+'vw'; el.style.setProperty('--x', x+'vw'); el.style.setProperty('--drift', drift); el.style.setProperty('--dur', dur);
-      el.style.animationDelay=(-Math.random()*8)+'s'; root.appendChild(el); setTimeout(()=> el.remove(), 16000); }
-    for(let i=0;i<N;i++) spawn(); setInterval(spawn, 600);
+    /***** Сакура-дождь *****/
+    const sak=document.getElementById('sak'), W=innerWidth, N=14;
+    for(let i=0;i<N;i++){
+      const s=document.createElement('div');
+      s.className='lite'; s.textContent='🌸';
+      s.style.left=(Math.random()*W)+'px';
+      s.style.animationDuration=(12+Math.random()*12)+'s';
+      s.style.animationDelay=(Math.random()*6)+'s';
+      sak.appendChild(s);
+    }
+
+    /***** Константы *****/
+    const DAYS=["Пн.","Вт.","Ср.","Чт.","Пт.","Сб.","Вск."];
+    const STORAGE_KEY='sakura_clean_draft_v2';
+    const STORE_PREFIX='sakura_clean_week_';
+    const STORE_INDEX='sakura_clean_weeks_index_v1';
+    const DBT_KEY='dbt_hw_html';
+
+    /***** Построение таблицы по дням *****/
+    const tbody=document.getElementById('rows-week');
+    const num=(n,min,max)=>`<input type="number" name="${n}" min="${min}" max="${max}">`;
+    DAYS.forEach((d,i)=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <th class="center">${d}</th>
+        <td>${num(`urge_suicide_${i}`,0,5)}</td>
+        <td>${num(`urge_selfharm_${i}`,0,5)}</td>
+        <td>${num(`urge_substances_${i}`,0,5)}</td>
+        <td>${num(`urge_aggr_${i}`,0,5)}</td>
+        <td>${num(`emptiness_${i}`,0,5)}</td>
+        <td>${num(`fatigue_${i}`,0,5)}</td>
+        <td>${num(`joy_${i}`,0,5)}</td>
+        <td>${num(`skills_${i}`,0,7)}</td>`;
+      tbody.appendChild(tr);
+    });
+
+    /***** Сбор/установка всех полей *****/
+    const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+    const $=(s,r=document)=>r.querySelector(s);
+    function getAll(){
+      const d={};
+      $$('input,select,textarea').forEach(el=>{
+        if(!el.name) return;
+        d[el.name] = el.type==='checkbox' ? !!el.checked : el.value;
+      });
+      const ed=$("#dbtEditor");
+      if (ed) d[DBT_KEY]=ed.innerHTML||'';
+      return d;
+    }
+    function setAll(d){
+      if(!d) return;
+      $$('input,select,textarea').forEach(el=>{
+        if(Object.prototype.hasOwnProperty.call(d, el.name)){
+          if(el.type==='checkbox') el.checked=!!d[el.name];
+          else el.value=d[el.name];
+        }
+      });
+      const ed=$("#dbtEditor");
+      if(ed && d[DBT_KEY]!==undefined) ed.innerHTML=d[DBT_KEY];
+    }
+
+    /***** Локальное сохранение *****/
+    function saveLocal(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(getAll())); }
+    function loadLocal(){ setAll(JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}')); }
+    document.addEventListener('input', saveLocal);
+    $('#saveBtn').addEventListener('click', ()=>{ saveLocal(); alert('Сохранено локально 🌸'); });
+    $('#resetBtn').addEventListener('click', ()=>{ if(confirm('Очистить все поля?')){ localStorage.removeItem(STORAGE_KEY); location.reload(); }});
+
+    /***** Сохранение недели локально + список недель *****/
+    const idxRead=()=>{ try{return JSON.parse(localStorage.getItem(STORE_INDEX)||'[]');}catch{return []} };
+    const idxWrite=v=>localStorage.setItem(STORE_INDEX, JSON.stringify(v));
+    const weekId=()=> $('input[name="week_start"]').value || new Date().toISOString().slice(0,10);
+    const weekTitle=()=>{ const n=$('input[name="name"]').value||'Без имени'; const ws=$('input[name="week_start"]').value||'—'; return `${ws} — ${n}`; };
+
+    function saveWeek(){
+      const id=weekId(); const data=getAll(); const when=new Date().toISOString(); const title=weekTitle();
+      localStorage.setItem(STORE_PREFIX+id, JSON.stringify({id,title,when,data}));
+      const idx=idxRead(); const ex=idx.find(x=>x.id===id);
+      if(ex){ ex.title=title; ex.when=when; } else { idx.unshift({id,title,when}); }
+      idxWrite(idx);
+      alert('Неделя сохранена 🌸');
+    }
+    $('#saveWeekBtn').addEventListener('click', saveWeek);
+
+    (function initWeeksModal(){
+      const modal=document.createElement('div');
+      modal.innerHTML=`
+      <div id="weeksModal" class="modal" style="display:none;position:fixed;inset:0;z-index:50">
+        <div class="backdrop" style="position:absolute;inset:0;background:rgba(0,0,0,.28)"></div>
+        <div class="card" role="dialog" aria-modal="true" style="max-width:680px;margin:10vh auto;background:var(--panel)">
+          <h3 style="margin:0 0 8px">Сохранённые недели</h3>
+          <div id="weeksEmpty" class="muted" style="display:none">Пока нет сохранённых недель</div>
+          <select id="weeksSelect" size="8" style="width:100%;margin:8px 0"></select>
+          <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button id="openWeekBtn" class="btn">Открыть</button>
+            <button id="deleteWeekBtn" class="btn ghost">Удалить</button>
+            <button id="closeWeeksBtn" class="btn ghost">Закрыть</button>
+          </div>
+        </div>
+      </div>`;
+      document.body.appendChild(modal);
+      const box=modal.firstElementChild;
+      function open(){
+        const sel=modal.querySelector('#weeksSelect'), empty=modal.querySelector('#weeksEmpty');
+        sel.innerHTML='';
+        const idx=idxRead();
+        empty.style.display=idx.length?'none':'block';
+        idx.forEach(w=>{
+          const o=document.createElement('option');
+          o.value=w.id; o.textContent=`${w.id} — ${w.title}`; sel.appendChild(o);
+        });
+        box.style.display='block';
+      }
+      function close(){ box.style.display='none'; }
+      $('#weeksBtn').addEventListener('click', open);
+      modal.querySelector('#closeWeeksBtn').addEventListener('click', close);
+      modal.querySelector('.backdrop').addEventListener('click', close);
+      modal.querySelector('#openWeekBtn').addEventListener('click', ()=>{
+        const id=modal.querySelector('#weeksSelect').value;
+        if(!id) return;
+        const raw=localStorage.getItem(STORE_PREFIX+id);
+        if(!raw) return;
+        try{ const {data}=JSON.parse(raw); setAll(data); saveLocal(); close(); }catch{ alert('Ошибка загрузки записи'); }
+      });
+      modal.querySelector('#deleteWeekBtn').addEventListener('click', ()=>{
+        const id=modal.querySelector('#weeksSelect').value; if(!id) return;
+        if(!confirm('Удалить выбранную неделю?')) return;
+        localStorage.removeItem(STORE_PREFIX+id);
+        const idx=idxRead().filter(w=>w.id!==id); idxWrite(idx); open();
+      });
+    })();
+
+    /***** Публикация по ссылке через Supabase *****/
+    const SUPA_URL = 'https://jefcwyyxvoihtykizqem.supabase.co';
+    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImplZmN3eXl4dm9paHR5a2l6cWVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1Mzg0MTksImV4cCI6MjA3NTExNDQxOX0.pw2F9cpmeYBrTdW67_Xcpg4AhVKX2b0osGdngzLBBGI';
+    const supabase = window._createSupabaseClient ? window._createSupabaseClient(SUPA_URL, SUPA_KEY) : null;
+
+    $('#shareBtn').addEventListener('click', async ()=>{
+      if(!supabase){ alert('Supabase не инициализирован'); return; }
+      const payload = getAll();
+      const { data, error } = await supabase
+        .from('diaries')
+        .insert([{ data: payload }])
+        .select('id')
+        .single();
+      if (error || !data) {
+        console.error(error); alert('Не удалось сохранить запись 😢'); return;
+      }
+      const link = `${location.origin}/share.html?id=${data.id}`;
+      const out = $('#shareOut'); if (out) out.value = link;
+      try { await navigator.clipboard.writeText(link); } catch(e) {}
+      alert('Ссылка скопирована 🌸');
+    });
+
+    // Загрузить локально при открытии
+    loadLocal();
   </script>
 </body>
 </html>
