@@ -2,104 +2,54 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <title>Публичная запись — Sakura</title>
+  <title>Сакура — данные по ссылке</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#ffeef6">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="apple-touch-icon" href="favicon.svg">
+  <style>
+    :root{--bg:#fff8fb;--panel:#ffeef6;--ink:#2b2b2b;--line:#f5cfe0}
+    body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 Manrope,system-ui,Segoe UI,Roboto,Arial}
+    .wrap{max-width:900px;margin:28px auto;padding:0 14px}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+    pre{white-space:pre-wrap;word-break:break-word;background:#fff;border:1px solid var(--line);padding:12px;border-radius:10px}
+  </style>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap&subset=cyrillic-ext" rel="stylesheet">
-  <style>
-    :root{--bg:#fff8fb;--panel:#ffeef6;--ink:#2b2b2b;--muted:#6c6c6c;--line:#f5cfe0}
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 'Manrope',ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
-    .wrap{max-width:960px;margin:20px auto;padding:0 14px}
-    .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
-    .grid{display:grid;gap:12px}
-    pre{background:#fff;border:1px dashed var(--line);border-radius:12px;padding:12px;overflow:auto}
-    .muted{color:var(--muted)}
-    .sakura-lite{position:fixed;inset:0;pointer-events:none;z-index:-1}
-    .lite{position:absolute;opacity:.35;font-size:18px;animation:fall linear infinite}
-    @keyframes fall{0%{transform:translateY(-10vh) rotate(0)}100%{transform:translateY(110vh) rotate(360deg);opacity:0}}
-    @media(print){.sakura-lite{display:none}}
-  </style>
-</head>
-<body>
-  <div class="sakura-lite" id="sak"></div>
-  <div class="wrap">
-    <div class="card grid">
-      <h1 style="margin:0">🌸 Публичная запись — Sakura</h1>
-      <div id="status" class="muted">Загрузка…</div>
-      <div id="main" style="display:none">
-        <div class="grid" style="grid-template-columns:1fr 1fr 1fr">
-          <div><b>Имя</b><div id="v_name" class="muted">—</div></div>
-          <div><b>Дата</b><div id="v_date" class="muted">—</div></div>
-          <div><b>Неделя начата</b><div id="v_week" class="muted">—</div></div>
-        </div>
-        <div>
-          <b>Комментарий к сессии</b>
-          <div id="v_comment" class="muted" style="white-space:pre-wrap">—</div>
-        </div>
-        <div>
-          <b>Домашнее задание ДБТ</b>
-          <div id="v_dbt" style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px"></div>
-        </div>
-        <div>
-          <b>Все данные</b>
-          <pre id="v_json">{}</pre>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Supabase клиент -->
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&display=swap&subset=cyrillic-ext" rel="stylesheet">
   <script type="module">
     import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-    // лёгкая анимация
-    const sak=document.getElementById('sak'), W=innerWidth, N=12;
-    for(let i=0;i<N;i++){
-      const s=document.createElement('div'); s.className='lite'; s.textContent='🌸';
-      s.style.left=(Math.random()*W)+'px'; s.style.animationDuration=(12+Math.random()*12)+'s';
-      s.style.animationDelay=(Math.random()*6)+'s'; sak.appendChild(s);
-    }
 
     const SUPA_URL = 'https://jefcwyyxvoihtykizqem.supabase.co';
     const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImplZmN3eXl4dm9paHR5a2l6cWVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1Mzg0MTksImV4cCI6MjA3NTExNDQxOX0.pw2F9cpmeYBrTdW67_Xcpg4AhVKX2b0osGdngzLBBGI';
     const supabase = createClient(SUPA_URL, SUPA_KEY);
 
-    const $ = s=>document.querySelector(s);
-    const st=$('#status'), main=$('#main');
+    async function main() {
+      const u = new URL(location.href);
+      const slug = u.searchParams.get('slug');
+      const box = document.getElementById('out');
 
-    const params = new URLSearchParams(location.search);
-    const id = params.get('id');
+      if (!slug) { box.textContent = 'Нет параметра slug 😢'; return; }
 
-    if(!id){ st.textContent='Не передан параметр id'; }
-    else{
-      try{
-        const { data, error } = await supabase
-          .from('diaries')
-          .select('data')
-          .eq('id', id)
-          .single();
+      const { data, error } = await supabase
+        .from('sakura_shares')
+        .select('payload')
+        .eq('slug', slug)
+        .single();
 
-        if(error || !data){ st.textContent='Запись не найдена 😢'; console.error(error); }
-        else{
-          st.style.display='none'; main.style.display='grid';
-          const d = data.data || {};
-          $('#v_name').textContent = d.name || '—';
-          $('#v_date').textContent = d.date || '—';
-          $('#v_week').textContent = d.week_start || '—';
-          $('#v_comment').textContent = d.session_comment || '—';
-          $('#v_dbt').innerHTML = (d.dbt_hw_html || '').trim() || '<span class="muted">нет</span>';
-          $('#v_json').textContent = JSON.stringify(d, null, 2);
-        }
-      }catch(e){
-        console.error(e); st.textContent='Ошибка загрузки';
-      }
+      if (error || !data) { box.textContent = 'Ссылка не найдена или удалена.'; return; }
+
+      box.textContent = JSON.stringify(data.payload, null, 2);
     }
+
+    main();
   </script>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🌸 Сакура — данные по ссылке</h1>
+    <div class="card">
+      <h3>Содержимое</h3>
+      <pre id="out">Загружаю…</pre>
+    </div>
+  </div>
 </body>
 </html>
 
