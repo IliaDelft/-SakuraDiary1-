@@ -14,33 +14,42 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&display=swap&subset=cyrillic-ext" rel="stylesheet">
-  <script type="module">
-    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+  <!-- Подключаем supabase-js через CDN (без module) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    const SUPA_URL = 'https://jefcwyyxvoihtykizqem.supabase.co';
-    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImplZmN3eXl4dm9paHR5a2l6cWVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1Mzg0MTksImV4cCI6MjA3NTExNDQxOX0.pw2F9cpmeYBrTdW67_Xcpg4AhVKX2b0osGdngzLBBGI';
-    const supabase = createClient(SUPA_URL, SUPA_KEY);
+<!-- Наш код -->
+<script>
+  const SUPA_URL = 'https://jefcwyyxvoihtykizqem.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImplZmN3eXl4dm9paHR5a2l6cWVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1Mzg0MTksImV4cCI6MjA3NTExNDQxOX0.pw2F9cpmeYBrTdW67_Xcpg4AhVKX2b0osGdngzLBBGI';
 
-    async function main() {
-      const u = new URL(location.href);
-      const slug = u.searchParams.get('slug');
-      const box = document.getElementById('out');
+  // создаём клиент
+  const supa = window.supabase?.createClient(SUPA_URL, SUPA_KEY);
 
-      if (!slug) { box.textContent = 'Нет параметра slug 😢'; return; }
+  async function main() {
+    const box = document.getElementById('out');
+    if (!supa) { box.textContent = 'Supabase не загрузился.'; return; }
 
-      const { data, error } = await supabase
-        .from('sakura_shares')
-        .select('payload')
-        .eq('slug', slug)
-        .single();
+    const u = new URL(location.href);
+    const slug = u.searchParams.get('slug');
+    if (!slug) { box.textContent = 'Нет параметра slug 😢'; return; }
 
-      if (error || !data) { box.textContent = 'Ссылка не найдена или удалена.'; return; }
+    const { data, error } = await supa
+      .from('sakura_shares')
+      .select('payload')
+      .eq('slug', slug)
+      .single();
 
-      box.textContent = JSON.stringify(data.payload, null, 2);
+    if (error || !data) {
+      console.error(error);
+      box.textContent = 'Ссылка не найдена или удалена.';
+      return;
     }
 
-    main();
-  </script>
+    box.textContent = JSON.stringify(data.payload, null, 2);
+  }
+
+  main();
+</script>
 </head>
 <body>
   <div class="wrap">
